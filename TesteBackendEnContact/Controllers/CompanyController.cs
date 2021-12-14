@@ -22,7 +22,7 @@ namespace TesteBackendEnContact.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ICompany>> Post(SaveCompanyRequest company)
+        public async Task<ActionResult<ICompany>> Post(PostCompanyRequest company)
         {
             return Ok(await _companyRepository.SaveAsync(company.ToCompany()));
         }
@@ -43,6 +43,12 @@ namespace TesteBackendEnContact.Controllers
         public async Task<ICompany> Get(int id)
         {
             return await _companyRepository.GetAsync(id);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<ICompany>> Put([FromBody] PutCompanyRequest company)
+        {
+            return Ok(await _companyRepository.Put(company.ToCompany()));
         }
     }
 }
