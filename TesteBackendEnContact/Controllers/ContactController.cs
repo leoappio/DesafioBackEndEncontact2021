@@ -13,10 +13,12 @@ namespace TesteBackendEnContact.Controllers
     public class ContactController : ControllerBase
     {
         private readonly ILogger<ContactController> _logger;
+        private readonly IContactRepository _repository;
 
-        public ContactController(ILogger<ContactController> logger)
+        public ContactController(ILogger<ContactController> logger, IContactRepository contactRepository)
         {
             _logger = logger;
+            _repository = contactRepository;
         }
 
 

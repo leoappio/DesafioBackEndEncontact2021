@@ -3,6 +3,7 @@ using Dapper.Contrib.Extensions;
 using Microsoft.Data.Sqlite;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using TesteBackendEnContact.Core.Domain.ContactBook;
 using TesteBackendEnContact.Core.Interface.ContactBook;
@@ -14,19 +15,20 @@ namespace TesteBackendEnContact.Repository
     public class ContactBookRepository : IContactBookRepository
     {
         private readonly DatabaseConfig databaseConfig;
+        private readonly SqliteConnection _connection;
 
         public ContactBookRepository(DatabaseConfig databaseConfig)
         {
             this.databaseConfig = databaseConfig;
+            _connection = new SqliteConnection(databaseConfig.ConnectionString);
         }
 
 
         public async Task<IContactBook> SaveAsync(IContactBook contactBook)
         {
-            using var connection = new SqliteConnection(databaseConfig.ConnectionString);
             var dao = new ContactBookDao(contactBook);
 
-            dao.Id = await connection.InsertAsync(dao);
+            dao.Id = await _connection.InsertAsync(dao);
 
             return dao.Export();
         }
@@ -34,23 +36,19 @@ namespace TesteBackendEnContact.Repository
 
         public async Task DeleteAsync(int id)
         {
-            using var connection = new SqliteConnection(databaseConfig.ConnectionString);
 
-            // TODO
-            var sql = "";
+            var sql = new StringBuilder();
+            sql.AppendLine("DELETE FROM ContactBook WHERE Id = @id;");
 
-            await connection.ExecuteAsync(sql);
+            await _connection.ExecuteAsync(sql.ToString(), new { id });
         }
-
-
 
 
         public async Task<IEnumerable<IContactBook>> GetAllAsync()
         {
-            using var connection = new SqliteConnection(databaseConfig.ConnectionString);
 
             var query = "SELECT * FROM ContactBook";
-            var result = await connection.QueryAsync<ContactBookDao>(query);
+            var result = await _connection.QueryAsync<ContactBookDao>(query);
 
             var returnList = new List<IContactBook>();
 
@@ -62,6 +60,7 @@ namespace TesteBackendEnContact.Repository
 
             return returnList.ToList();
         }
+
         public async Task<IContactBook> GetAsync(int id)
         {
             var list = await GetAllAsync();
@@ -84,7 +83,7 @@ namespace TesteBackendEnContact.Repository
         public ContactBookDao(IContactBook contactBook)
         {
             Id = contactBook.Id;
-            Name = Name;
+            Name = contactBook.Name;
         }
 
         public IContactBook Export() => new ContactBook(Id, Name);
