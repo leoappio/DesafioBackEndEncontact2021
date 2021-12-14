@@ -43,6 +43,15 @@ namespace TesteBackendEnContact.Repository
             await _connection.ExecuteAsync(sql.ToString(), new { id });
         }
 
+        public async Task<IContactBook> Put(IContactBook contactBook)
+        {
+            var dao = new ContactBookDao(contactBook);
+
+            await _connection.UpdateAsync(dao);
+
+            return dao.Export();
+        }
+
 
         public async Task<IEnumerable<IContactBook>> GetAllAsync()
         {

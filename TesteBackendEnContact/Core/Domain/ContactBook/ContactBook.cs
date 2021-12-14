@@ -12,5 +12,10 @@ namespace TesteBackendEnContact.Core.Domain.ContactBook
             Id = id;
             Name = name;
         }
+
+        public ContactBook(string name)
+        {
+            Name = name;
+        }
     }
 }
